@@ -1,22 +1,9 @@
-# ROS2 Nav2 TTC Dynamic Obstacle Avoidance
-
-## 项目名称
-
-**基于 ROS2 Nav2 的移动机器人导航优化与动态障碍物 TTC 避障系统**
-
-GitHub 仓库建议命名：
-
-```text
-ros2-nav2-ttc-dynamic-avoidance
-```
-
----
-
+#ROS2 Nav2 TTC 动态障碍物
 ## 项目简介
 
 本项目基于 **ROS2 Humble** 与 **Nav2** 构建移动机器人自主导航优化系统，完成 Gazebo 仿真环境、FishBot 差速底盘、AMCL 定位、SmacPlanner2D 全局规划、DWB 局部控制、global/local costmap 配置与 RViz 可视化验证。
 
-针对移动机器人在复杂环境中存在的 **窄通道通行困难、路径贴边、动态障碍物横穿碰撞风险、多速度源抢占控制** 等问题，本项目在 Nav2 原有导航链路基础上，设计了 `dynamic_scan_filter`、`intersection_supervisor` 和 `intersection_speed_gate` 节点，实现动态障碍物提取、TTC / 相对 TTC 风险判断、速度门控控制，并结合 `collision_monitor` 构建最终安全保护层。
+针对**等问题，本项目在Nav2原有导航链路基础上，设计了dynamic_scan_filter`、intersection_supervisor和intersection_speed_gate节点，实现动态障碍物提取、TTC/相对TTC风险判断、速度门控控制，并结合collision_monitor构建最终安全保护层。
 
 项目最终实现了机器人在动态障碍物靠近时减速、预测存在碰撞风险时停车等待、障碍物离开后恢复通行，以及底盘只接收最终安全速度 `/cmd_vel_safe` 的完整闭环。
 
@@ -28,7 +15,7 @@ ros2-nav2-ttc-dynamic-avoidance
 - 使用 AMCL 完成机器人定位
 - 使用 SmacPlanner2D 完成全局路径规划
 - 使用 DWB 完成局部轨迹跟踪
-- 通过 costmap inflation layer 与 DWB critic 参数优化窄通道通行能力
+-通过costmap膨胀层与DWB评判器参数优化窄通道通行能力
 - 基于静态地图过滤激光雷达点云，提取动态障碍物
 - 引入 TTC 思想判断动态障碍物是否会进入机器人通行区域
 - 引入相对 TTC 判断机器人与动态障碍物之间是否正在靠近
@@ -41,7 +28,7 @@ ros2-nav2-ttc-dynamic-avoidance
 ## 系统架构
 
 ```text
-Gazebo 仿真环境
+凉亭仿真环境
         ↓
 FishBot 差速移动机器人
         ↓
@@ -49,65 +36,65 @@ FishBot 差速移动机器人
         ↓
 Nav2 导航系统
         ↓
-dynamic_scan_filter
+动态扫描滤波器
         ↓
-intersection_supervisor
+交叉路口监管
         ↓
-intersection_speed_gate
+交叉路口限速门
         ↓
-collision_monitor
+碰撞监测
         ↓
-fishbot_diff_drive_controller
+鱼形机器人差速控制器
 ```
 
 系统主要分为以下几层：
 
 ```text
 感知层：
-    LaserScan / TF / Map
+激光扫描 / TF / 地图
 
 动态障碍物提取层：
-    dynamic_scan_filter
+动态扫描滤波器
 
 决策层：
-    intersection_supervisor
+交叉路口监管
 
 速度门控层：
-    intersection_speed_gate
+交叉路口限速门
 
 安全保护层：
-    collision_monitor
+碰撞监测
 
 执行层：
-    fishbot_diff_drive_controller
+鱼形机器人差速控制器
 ```
 
 ---
 
 ## 速度控制链路
 
-普通 Nav2 系统中，`velocity_smoother` 通常直接发布 `/cmd_vel` 给底盘控制器。
+在普通Nav2系统中，`velocity_smoother`通常直接发布`/cmd_vel`给底盘控制器。
 
 本项目没有让 `/cmd_vel` 直接控制底盘，而是设计了多级速度链路：
 
-```text
-Nav2 controller_server / behavior_server
+```文本
+Nav2 控制器_服务器 / 行为_服务器
         ↓
 /cmd_vel_raw
 
-velocity_smoother
+速度平滑器
         ↓
 /cmd_vel
 
-intersection_speed_gate
+交叉路口限速门
         ↓
 /cmd_vel_risk
 
-collision_monitor
+碰撞监测
         ↓
 /cmd_vel_safe
 
-fishbot_diff_drive_controller
+鱼形机器人差速控制器
 ```
 
 各速度话题含义如下：
@@ -117,7 +104,7 @@ fishbot_diff_drive_controller
 | `/cmd_vel_raw` | Nav2 controller_server / behavior_server 输出的原始速度 |
 | `/cmd_vel` | velocity_smoother 输出的平滑速度 |
 | `/cmd_vel_risk` | intersection_speed_gate 根据 TTC 风险门控后的速度 |
-| `/cmd_vel_safe` | collision_monitor 输出的最终安全速度 |
+| `/cmd_vel_safe` |碰撞监测器输出的最终安全速度|
 
 底盘控制器最终只订阅：
 
@@ -140,7 +127,7 @@ fishbot_diff_drive_controller
 ```text
 /scan + /map + TF
         ↓
-将激光点转换到 map 坐标系
+将激光点转换到地图坐标系
         ↓
 利用静态地图过滤墙体和固定障碍物
         ↓
@@ -170,12 +157,12 @@ fishbot_diff_drive_controller
 
 输出决策状态：
 
-```text
-NORMAL_NAVIGATION
-SLOW_DOWN
-YIELD_WAIT
-PASS_INTERSECTION
-RECOVERY
+```文本
+正常导航
+减速
+让行等待
+通过路口
+恢复
 ```
 
 各状态含义如下：
@@ -368,19 +355,6 @@ ros2-nav2-ttc-dynamic-avoidance/
 │
 ├── README.md
 └── .gitignore
-```
-
-如果后续添加实验截图，可以增加：
-
-```text
-images/
-```
-
-如果后续添加更详细的项目文档，可以增加：
-
-```text
-docs/
-```
 
 ---
 
