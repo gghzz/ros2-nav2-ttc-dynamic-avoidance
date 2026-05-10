@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>moving_obstacle_plugin</name>
+  <version>0.0.1</version>
+  <description>Gazebo moving obstacle plugin</description>
+
+  <maintainer email="you@example.com">you</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>gazebo</depend>
+
+  <export/>
+</package>
