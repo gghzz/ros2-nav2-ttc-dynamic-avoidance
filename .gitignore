@@ -1,19 +1,17 @@
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-CMakeUserPresets.json
-
+build/
+install/
+log/
+*.pyc
+__pycache__/
+.cache/
+.vscode/
+.idea/
+*.bag
+*.db3
+*.mcap
 # CLion
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+# JetBrains 特定模板维护在单独的 JetBrains.gitignore 中，该文件可
+# 在 https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore 找到
+# 并可添加到全局gitignore或合并到此文件中。对于更彻底的
+# 方案（不推荐）,您可以取消注释以下内容以忽略整个idea文件夹。
 #cmake-build-*
